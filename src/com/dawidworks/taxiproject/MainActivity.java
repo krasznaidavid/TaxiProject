@@ -5,10 +5,6 @@ import java.lang.reflect.Method;
 
 import com.dawidworks.taxiproject.layout.ZoomOutPageTransformer;
 
-import android.app.Activity;
-import android.app.KeyguardManager;
-import android.app.KeyguardManager.KeyguardLock;
-import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,7 +17,7 @@ import android.view.WindowManager;
 
 public class MainActivity extends FragmentActivity {
 	
-	private static final int NUM_PAGES = 5;
+	private static final int NUM_PAGES = 3;
 	private ViewPager mPager;
 	private PagerAdapter mPagerAdapter;
 	
@@ -50,7 +46,7 @@ public class MainActivity extends FragmentActivity {
 	public void onWindowFocusChanged(boolean hasFocus) {
 		try
         {
-			//Hack: így lehet megakadályozni a státuszbár legödítését
+		   //Hack: így lehet megakadályozni a státuszbár legödítését
            if(!hasFocus)
            {
                 Object service = getSystemService("statusbar");

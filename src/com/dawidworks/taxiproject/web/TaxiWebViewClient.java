@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 public class TaxiWebViewClient extends WebViewClient {
 	
@@ -15,14 +16,21 @@ public class TaxiWebViewClient extends WebViewClient {
 	
 	@Override
 	public boolean shouldOverrideUrlLoading(WebView view, String url) {
-		return isAcceptedeUrl(url);
+		return isAcceptedeUrl(view, url);
 	}
 	
-	private boolean isAcceptedeUrl(String url) {
+	private boolean isAcceptedeUrl(WebView view, String url) {
 		for (String urlStr : mAcceptedUrls) {
-			if (url.startsWith(urlStr))
+			if (!urlStr.startsWith("http://") && !urlStr.startsWith("https://")) {
+				String httpUrl = "http://" + urlStr;
+				String httpsUrl = "https://" + urlStr;
+				if (url.startsWith(httpUrl) || url.startsWith(httpsUrl))
+					return false;
+			}
+			else if (url.startsWith(urlStr))
 				return false;
 		}
+		Toast.makeText(view.getContext(), "Navigálunk navigálunk? Sajnos nem lehet :(", Toast.LENGTH_SHORT).show();
 		return true;
 	}
 }

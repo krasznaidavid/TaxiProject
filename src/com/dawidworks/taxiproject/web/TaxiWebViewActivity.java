@@ -36,6 +36,9 @@ public class TaxiWebViewActivity extends Activity {
 		mWebView = (WebView) findViewById(R.id.webView);
 		mWebView.setWebViewClient(new TaxiWebViewClient(acceptedUrls));
 		mWebView.getSettings().setJavaScriptEnabled(true);
+		mWebView.getSettings().setBuiltInZoomControls(true);
+		mWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
+		mWebView.getSettings().setSupportMultipleWindows(false);
 		mWebView.loadUrl(startUrl);
 	}
 	

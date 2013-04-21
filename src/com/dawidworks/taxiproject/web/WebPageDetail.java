@@ -57,6 +57,8 @@ public class WebPageDetail {
 	}
 	
 	public void setStartUrl(String startUrl) {
+		if (!startUrl.startsWith("http://") && !startUrl.startsWith("https://"))
+			startUrl = "http://" + startUrl;
 		this.mStartUrl = startUrl;
 	}
 

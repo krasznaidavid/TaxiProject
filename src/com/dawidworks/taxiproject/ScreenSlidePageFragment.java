@@ -5,7 +5,10 @@ import com.dawidworks.taxiproject.web.TaxiWebViewActivity;
 import com.dawidworks.taxiproject.web.WebPageDetail;
 import com.dawidworks.taxiproject.web.WebPageDetailManager;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.Toast;
 
 public class ScreenSlidePageFragment extends Fragment{
 	
@@ -52,16 +56,30 @@ public class ScreenSlidePageFragment extends Fragment{
             	WebPageDetail wpd = WebPageDetailManager.getWebPageDetail(mPageNumber, position);
             	
             	if (wpd != null) {
-	            	Intent intent = new Intent(rootView.getContext(), TaxiWebViewActivity.class);
-	            	intent.putStringArrayListExtra(TaxiWebViewActivity.ACCEPTED_URLS_KEY, wpd.getAcceptedUrls());
-	            	intent.putExtra(TaxiWebViewActivity.START_URL_KEY, wpd.getStartUrl());
-					startActivity(intent);
+            		if (isOnline(rootView)) {
+		            	Intent intent = new Intent(rootView.getContext(), TaxiWebViewActivity.class);
+		            	intent.putStringArrayListExtra(TaxiWebViewActivity.ACCEPTED_URLS_KEY, wpd.getAcceptedUrls());
+		            	intent.putExtra(TaxiWebViewActivity.START_URL_KEY, wpd.getStartUrl());
+						startActivity(intent);
+            		} else {
+            			Toast.makeText(rootView.getContext(), "Kapcsolódási hiba, próbálja újra", Toast.LENGTH_SHORT).show();
+            		}
             	}
             }
         });
         
         return rootView;
     }
+	
+	private boolean isOnline(View view) {
+	    ConnectivityManager cm =
+	        (ConnectivityManager) view.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
+	    if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+	        return true;
+	    }
+	    return false;
+	}
 
 	public int getPageNumber() {
         return mPageNumber;
