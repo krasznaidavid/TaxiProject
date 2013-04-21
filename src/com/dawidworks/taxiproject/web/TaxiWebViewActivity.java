@@ -2,6 +2,8 @@ package com.dawidworks.taxiproject.web;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.dawidworks.taxiproject.R;
 
@@ -18,6 +20,11 @@ public class TaxiWebViewActivity extends Activity {
 	public static final String ACCEPTED_URLS_KEY = "accpted_Urls";
 	
 	private WebView mWebView;
+	private Timer mTimer;
+	
+	public TaxiWebViewActivity() {
+		setUpAndStartTimer();
+	}
 
 	@SuppressLint("SetJavaScriptEnabled")
 	public void onCreate(Bundle savedInstanceState) {
@@ -42,21 +49,36 @@ public class TaxiWebViewActivity extends Activity {
 		mWebView.loadUrl(startUrl);
 	}
 	
+	private void setUpAndStartTimer() {
+		mTimer = new Timer();
+		mTimer.schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				if (!hasWindowFocus()) {
+					collapseStatusBar();
+				}
+			}
+		}, 100, 100);
+	}
+	
+	private void collapseStatusBar() {
+		//Hack: így lehet megakadályozni a státuszbár legödítését
+		try {
+            Object service = getSystemService("statusbar");
+            Class<?> statusbarManager = Class.forName("android.app.StatusBarManager");
+            Method collapse = statusbarManager.getMethod("collapse");
+            collapse.setAccessible(true);
+            collapse.invoke(service);
+        }
+	    catch(Exception ex)
+	    {}
+	}
+	
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-		try
-        {
-			//Hack: így lehet megakadályozni a státuszbár legödítését
-           if(!hasFocus)
-           {
-                Object service = getSystemService("statusbar");
-                Class<?> statusbarManager = Class.forName("android.app.StatusBarManager");
-                Method collapse = statusbarManager.getMethod("collapse");
-                collapse.setAccessible(true);
-                collapse.invoke(service);
-           }
+        if(!hasFocus) {
+			collapseStatusBar();
         }
-        catch(Exception ex)
-        {}
 	}
 }

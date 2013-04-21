@@ -2,6 +2,8 @@ package com.dawidworks.taxiproject;
 
 
 import java.lang.reflect.Method;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.dawidworks.taxiproject.layout.ZoomOutPageTransformer;
 
@@ -20,11 +22,15 @@ public class MainActivity extends FragmentActivity {
 	private static final int NUM_PAGES = 3;
 	private ViewPager mPager;
 	private PagerAdapter mPagerAdapter;
+	private Timer mTimer;
+	
+	public MainActivity() {
+		setUpAndStartTimer();
+	}
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);        
@@ -42,22 +48,37 @@ public class MainActivity extends FragmentActivity {
 
     }
 	
+	private void collapseStatusBar() {
+		//Hack: így lehet megakadályozni a státuszbár legödítését
+		try {
+            Object service = getSystemService("statusbar");
+            Class<?> statusbarManager = Class.forName("android.app.StatusBarManager");
+            Method collapse = statusbarManager.getMethod("collapse");
+            collapse.setAccessible(true);
+            collapse.invoke(service);
+        }
+	    catch(Exception ex)
+	    {}
+	}
+	
+	private void setUpAndStartTimer() {
+		mTimer = new Timer();
+		mTimer.schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				if (!hasWindowFocus()) {
+					collapseStatusBar();
+				}
+			}
+		}, 100, 100);
+	}
+	
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-		try
-        {
-		   //Hack: így lehet megakadályozni a státuszbár legödítését
-           if(!hasFocus)
-           {
-                Object service = getSystemService("statusbar");
-                Class<?> statusbarManager = Class.forName("android.app.StatusBarManager");
-                Method collapse = statusbarManager.getMethod("collapse");
-                collapse.setAccessible(true);
-                collapse.invoke(service);
-           }
+        if(!hasFocus) {
+			collapseStatusBar();
         }
-        catch(Exception ex)
-        {}
 	}
 	
 	private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
